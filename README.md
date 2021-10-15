@@ -18,7 +18,10 @@
 	- [Post-installation](#post-installation)
 	- [Last notes](#last-notes)
 
+<details>
+<summary>
 ## Gentoo Advanced Installer [Option 1]
+</summary>
 The GUI Installer guides you through the configuration process with detailed information regarding each step. The configurations are stored in the `gentoo.conf` file which can also be edited by hand by renaming the 'gentoo.conf.example' file, backed up and reused later if desired. 
 
 ## Partitioning
@@ -35,7 +38,7 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 2. Clone/download this repository.
 3. Run `./configure` to launch the GUI Installer
 4. Finally run `./install` to begin the installation process
-
+</details>
 # Gentoo Auto Install Script [Option 2]
 
 The Gentoo Auto Install script is run from inside the [Gentoo Live CD](https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20211010T170540Z/install-amd64-minimal-20211010T170540Z.iso) and will install Gentoo on the primary hard drive using the entire disk.
