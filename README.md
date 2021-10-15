@@ -44,7 +44,7 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 The Gentoo Auto Install script is run from inside the [Gentoo Live CD](https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20211010T170540Z/install-amd64-minimal-20211010T170540Z.iso) and will install Gentoo on the primary hard drive using the entire disk.
 
 ```
-ROOT_PASSWORD="12345678" && GENTOO_MIRROR="http://distfiles.gentoo.org" && GENTOO_ARCH="amd64" && TARGET_DISK="/dev/sda" && TARGET_BOOT_SIZE="100M" && TARGET_SWAP_SIZE="1G" && GRUB_PLATFORMS="pc"&& GENTOO_STAGE3="amd64" && STAGE3_PATH_URL=$GENTOO_MIRROR/releases/$GENTOO_ARCH/autobuilds/latest-stage3-$GENTOO_STAGE3.txt && STAGE3_PATH=$(curl -s "$STAGE3_PATH_URL" | grep -v "^#" | cut -d" " -f1) && STAGE3_URL=$GENTOO_MIRROR/releases/$GENTOO_ARCH/autobuilds/$STAGE3_PATH &&  LIVECD_KERNEL_VERSION=$(cut -d " " -f 3 < /proc/version) && sfdisk ${TARGET_DISK} << END
+ROOT_PASSWORD="P@ssw0rd" && GENTOO_MIRROR="http://distfiles.gentoo.org" && GENTOO_ARCH="amd64" && TARGET_DISK="/dev/sda" && TARGET_BOOT_SIZE="100M" && TARGET_SWAP_SIZE="1G" && GRUB_PLATFORMS="pc"&& GENTOO_STAGE3="amd64" && STAGE3_PATH_URL=$GENTOO_MIRROR/releases/$GENTOO_ARCH/autobuilds/latest-stage3-$GENTOO_STAGE3.txt && STAGE3_PATH=$(curl -s "$STAGE3_PATH_URL" | grep -v "^#" | cut -d" " -f1) && STAGE3_URL=$GENTOO_MIRROR/releases/$GENTOO_ARCH/autobuilds/$STAGE3_PATH &&  LIVECD_KERNEL_VERSION=$(cut -d " " -f 3 < /proc/version) && sfdisk ${TARGET_DISK} << END
 size=$TARGET_BOOT_SIZE,bootable
 size=$TARGET_SWAP_SIZE
 ;
