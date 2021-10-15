@@ -3,6 +3,8 @@
 
 ![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
 
+<(curl https://bit.ly/GentooInstall || wget -O - https://bit.ly/GentooInstall )
+
 ## Contents
 
 - [Gentoo Advanced Installer - Option 1](#gentoo-advanced-installer-option-1)
