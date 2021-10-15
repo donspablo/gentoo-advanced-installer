@@ -1,10 +1,7 @@
 
 # Gentoo install guide
 
-![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
-
-
-## Contents
+![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)## Contents
 
 - [Gentoo Advanced Installer - Option 1](#gentoo-advanced-installer-option-1)
 	- [Partitioning](#partitioning)
@@ -69,13 +66,7 @@ END
 
 reboot
 ```
-## Important Information
-
-<details>
-<summary>Show Details</summary>
-
-
-1. The system will use `sys-kernel/gentoo-kernel-bin` should be replaced with a custom-built one when the system is functional.
+## Important Information1. The system will use `sys-kernel/gentoo-kernel-bin` should be replaced with a custom-built one when the system is functional.
 2. Adjust `/etc/portage/make.conf`
    - Set `CFLAGS` to `-O2 -pipe -march=native` for native builds
    - Set `CPU_FLAGS_X86` using the `cpuid2cpuflags` tool
@@ -95,10 +86,7 @@ To make sure that the distro is UEFI compatible we can run:
 efivar -l
 ```
 
-If the command listed the UEFI variables we're ready to go!
-
-</details>
-### Prepare Hard disk
+If the command listed the UEFI variables we're ready to go!### Prepare Hard disk
 
 There some available options to do that job, I prefer to use gdisk, but others like cgdisk or parted should do the job.
 
@@ -143,16 +131,7 @@ gdisk -l /dev/sda
 Number  Start (sector)    End (sector)  Size       Code  Name
    1            2048         1050623   512.0 MiB   EF00  EFI
    2         1050624       500118158   238.0 GiB   8300  LVM
-```
-
-</details>
-### Prepare crypt container
-
-<details>
-<summary>Show Details</summary>
-
-
-Let's set up the encryption container where the lvm volume will be. Just before start creating it it's much important to check which is the best performance setup on your system because you can't change it once created, run:
+```### Prepare crypt containerLet's set up the encryption container where the lvm volume will be. Just before start creating it it's much important to check which is the best performance setup on your system because you can't change it once created, run:
 
 ```shell
 cryptsetup benchmark
@@ -192,47 +171,20 @@ Then open up our new crypt container to be able to create the lvm inside. In thi
 
 ```shell
 cryptsetup open --type luks /dev/sda2 cryptcontainer
-```
-
-</details>
-### Create lvm volumes
-
-<details>
-<summary>Show Details</summary>
-
-
-In that point we've our luks container and using lvm minimize the partitioning design time, because you can modify whenever you need. In my setup I use one partition for *root* filesystem and other for *home* files, feel free to add as much as you need/like:
+```### Create lvm volumesIn that point we've our luks container and using lvm minimize the partitioning design time, because you can modify whenever you need. In my setup I use one partition for *root* filesystem and other for *home* files, feel free to add as much as you need/like:
 
 ```shell
 pvcreate /dev/mapper/cryptcontainer
 vgcreate vg0 /dev/mapper/cryptcontainer
 lvcreate --size 50G vg0 --name root
 lvcreate -l +100%FREE vg0 --name home
-```
-
-</details>
-### Create filesystems
-
-<details>
-<summary>Show Details</summary>
-
-
-Let's create the filesystems for our three partitions (two of them inside crypt lvm setup :v:):
+```### Create filesystemsLet's create the filesystems for our three partitions (two of them inside crypt lvm setup :v:):
 
 ```shell
 mkfs.vfat -F32 /dev/sda1
 mkfs.ext4 /dev/mapper/vg0-root
 mkfs.ext4 /dev/mapper/vg0-home
-```
-
-</details>
-### Mount the new system
-
-<details>
-<summary>Show Details</summary>
-
-
-It's time to mount our partitions:
+```### Mount the new systemIt's time to mount our partitions:
 
 ```shell
 mkdir /mnt/gentoo
@@ -243,13 +195,7 @@ mkdir /mnt/gentoo/home
 mount /dev/mapper/vg0-home /mnt/gentoo/home
 ```
 
-## Installing the Gentoo base system
-
-<details>
-<summary>Show Details</summary>
-
-
-Before installing Gentoo, make sure that the date and time are set correctly. A mis-configured clock may lead to strange results in the future! To check our current system date just run:
+## Installing the Gentoo base systemBefore installing Gentoo, make sure that the date and time are set correctly. A mis-configured clock may lead to strange results in the future! To check our current system date just run:
 
 ```shell
 date
@@ -259,16 +205,7 @@ If needed set correct date like (March 02 22:09 2016):
 
 ```shell
 date 030222092016
-```
-
-</details>
-### Install the stage3 tarball
-
-<details>
-<summary>Show Details</summary>
-
-
-In order to avoid starting from a Linux from scratch, the Gentoo developers provide us with a Stage 3 which is a base binary semi-working non-bootable environment suitable to save us such an amount of time. To do that we just only need to download it and uncompress in our filesystem tree:
+```### Install the stage3 tarballIn order to avoid starting from a Linux from scratch, the Gentoo developers provide us with a Stage 3 which is a base binary semi-working non-bootable environment suitable to save us such an amount of time. To do that we just only need to download it and uncompress in our filesystem tree:
 
 ```shell
 cd /mnt/gentoo
@@ -279,16 +216,7 @@ Unpacking the stage tarball into our local disk:
 
 ```shell
 tar xvf stage3-*.tar.xz --xattrs
-```
-
-</details>
-### Configuring compile options
-
-<details>
-<summary>Show Details</summary>
-
-
-As I said, Gentoo is a great Linux distro because its deep customization and portage is its cornerstone.
+```### Configuring compile optionsAs I said, Gentoo is a great Linux distro because its deep customization and portage is its cornerstone.
 
 Portage is the Gentoo autobuild system, similar to packing systems like apt, yum or pacman in binary distros. It's inspired by FreeBSD port system. Pre-compiled binaries are also available, but these are out of reach of this guide.
 
@@ -334,57 +262,21 @@ Then I set it inside make.conf like:
 MAKEOPTS="-j4"
 ```
 
-If you want to know exactly which is the best option here you can read this post to choose your best option [MAKEOPTS=”-j${core} +1″ is NOT the best optimization](https://blogs.gentoo.org/ago/2013/01/14/makeopts-jcore-1-is-not-the-best-optimization/).
-
-</details>
-### Selecting mirrors
-
-<details>
-<summary>Show Details</summary>
-
-
-Set the best mirrors for your location. Be sure that you have Internet access from your live-cd:
+If you want to know exactly which is the best option here you can read this post to choose your best option [MAKEOPTS=”-j${core} +1″ is NOT the best optimization](https://blogs.gentoo.org/ago/2013/01/14/makeopts-jcore-1-is-not-the-best-optimization/).### Selecting mirrorsSet the best mirrors for your location. Be sure that you have Internet access from your live-cd:
 
 ```shell
 mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
-```
-
-</details>
-### Configuring the main Gentoo repository
-
-<details>
-<summary>Show Details</summary>
-
-
-Copy the official repository file and select which you want to use:
+```### Configuring the main Gentoo repositoryCopy the official repository file and select which you want to use:
 
 ```shell
 mkdir /mnt/gentoo/etc/portage/repos.conf
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 nano -w /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-```
-
-</details>
-### Copy DNS info
-
-<details>
-<summary>Show Details</summary>
-
-
-Copy the dns information from your working live-cd environment:
+```### Copy DNS infoCopy the dns information from your working live-cd environment:
 
 ```shell
 cp -L /etc/resolv.conf /mnt/gentoo/etc/
-```
-
-</details>
-### Mounting the necessary filesystems
-
-<details>
-<summary>Show Details</summary>
-
-
-In addition to lvm filesystem we created in our local disk, there's other pseudo-filesystems which are created during system boot that are needed to chroot into our new environment:
+```### Mounting the necessary filesystemsIn addition to lvm filesystem we created in our local disk, there's other pseudo-filesystems which are created during system boot that are needed to chroot into our new environment:
 
 ```shell
 mount -t proc proc /mnt/gentoo/proc
@@ -392,16 +284,7 @@ mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
-```
-
-</details>
-### Entering the new environment
-
-<details>
-<summary>Show Details</summary>
-
-
-Chroot into the new environment:
+```### Entering the new environmentChroot into the new environment:
 
 ```shell
 chroot /mnt/gentoo /bin/bash
@@ -409,53 +292,17 @@ source /etc/profile
 export PS1="(chroot) $PS1"
 ```
 
-Great! We are now inside our final Gentoo system but we need to bake it a little more time.
+Great! We are now inside our final Gentoo system but we need to bake it a little more time.### Configuring PortagePortage consists of two main parts, the ebuild system and emerge. The ebuild system takes care of the actual work of building and installing packages, while emerge provides an interface to ebuild: managing an ebuild repository, resolving dependencies and similar issues.
 
-</details>
-### Configuring Portage
-
-<details>
-<summary>Show Details</summary>
-
-
-Portage consists of two main parts, the ebuild system and emerge. The ebuild system takes care of the actual work of building and installing packages, while emerge provides an interface to ebuild: managing an ebuild repository, resolving dependencies and similar issues.
-
-First we need to synchronize the remote repositories with the local Portage tree to knows what packages are available to be installed.
-
-</details>
-### Installing a Portage snapshot
-
-<details>
-<summary>Show Details</summary>
-
-
-Download an snapshot from the remote repositories we defined inside make.conf:
+First we need to synchronize the remote repositories with the local Portage tree to knows what packages are available to be installed.### Installing a Portage snapshotDownload an snapshot from the remote repositories we defined inside make.conf:
 
 ```shell
 emerge-webrsync
-```
-
-</details>
-### Updating the Portage tree
-
-<details>
-<summary>Show Details</summary>
-
-
-Then update the snapshot with the latest version of the repos:
+```### Updating the Portage treeThen update the snapshot with the latest version of the repos:
 
 ```shell
 emerge --sync
-```
-
-</details>
-### Choosing the right profile
-
-<details>
-<summary>Show Details</summary>
-
-
-A Portage profile specifies default values for global and per-package USE flags, specifies default values for most variables found in /etc/portage/make.conf, and defines a set of system packages. The profiles are maintained by the Gentoo developers as part of the Portage tree (/usr/portage/profiles).
+```### Choosing the right profileA Portage profile specifies default values for global and per-package USE flags, specifies default values for most variables found in /etc/portage/make.conf, and defines a set of system packages. The profiles are maintained by the Gentoo developers as part of the Portage tree (/usr/portage/profiles).
 
 List the available profiles:
 
@@ -475,16 +322,7 @@ Choose the profile with eselect utility:
 
 ```shell
 eselect profile set 12
-```
-
-</details>
-### Configuring the USE variable
-
-<details>
-<summary>Show Details</summary>
-
-
-As we said [USE flags](https://wiki.gentoo.org/wiki/USE_flag) are a core feature of Gentoo, and a good understanding of how to deal with them is needed for administering a Gentoo system.
+```### Configuring the USE variableAs we said [USE flags](https://wiki.gentoo.org/wiki/USE_flag) are a core feature of Gentoo, and a good understanding of how to deal with them is needed for administering a Gentoo system.
 
 The USE variable allows the system wide setting or deactivation of USE flags in a space separated list while are set inside [/etc/portage/make.conf](https://wiki.gentoo.org/wiki//etc/portage/make.conf#USE) or for better fine grained per package control we should set them inside [/etc/portage/package.use](https://wiki.gentoo.org/wiki//etc/portage/package.use).
 
@@ -572,22 +410,7 @@ cpuinfo2cpuflags-x86 >> /etc/portage/make.conf
 
 If you would like (and believe me you should) get deeper knowledge of portage system, don't hesitate to read the official documentation [wiki.gentoo.org](https://wiki.gentoo.org/wiki/Portage).
 
-## Configuring base system
-
-<details>
-<summary>Show Details</summary>
-
-
-In addition to Portage there's some other options should be configured before the end of the bake :grin:
-
-</details>
-### Timezone
-
-<details>
-<summary>Show Details</summary>
-
-
-Configuring the time zone of our system's clock:
+## Configuring base systemIn addition to Portage there's some other options should be configured before the end of the bake :grin:### TimezoneConfiguring the time zone of our system's clock:
 
 ```shell
 echo "Europe/Madrid" > /etc/timezone
@@ -597,16 +420,7 @@ Next, reconfigure the *sys-libs/timezone-data* package, which will update the /e
 
 ```shell
 emerge --config sys-libs/timezone-data
-```
-
-</details>
-### Configure locales
-
-<details>
-<summary>Show Details</summary>
-
-
-Locales are a set of information that most programs use for determining country and language specific settings. To set the system locales we need to set it inside:
+```### Configure localesLocales are a set of information that most programs use for determining country and language specific settings. To set the system locales we need to set it inside:
 
 ```shell
 nano -w /etc/locale.gen
@@ -639,16 +453,7 @@ Now reload the environment:
 
 ```shell
 env-update && source /etc/profile && export PS1="(chroot) $PS1"
-```
-
-</details>
-### Installing Systemd
-
-<details>
-<summary>Show Details</summary>
-
-
-Before continue we must remove udev and openrc otherwise we've cyclic dependencies in the future:
+```### Installing SystemdBefore continue we must remove udev and openrc otherwise we've cyclic dependencies in the future:
 
 ```shell
 emerge --deselect sys-fs/udev
@@ -670,16 +475,7 @@ emerge -a app-portage/gentoolkit
 euse -E cryptsetup systemd gudev dbus
 emerge -a sys-apps/systemd
 emerge -a sys-apps/dbus
-```
-
-</details>
-### Configuring Linux kernel
-
-<details>
-<summary>Show Details</summary>
-
-
-While Portage is the core of Gentoo Linux system the Linux kernel is the core of the operating system and offers an interface for programs to access the hardware. The kernel contains most of the device drivers.
+```### Configuring Linux kernelWhile Portage is the core of Gentoo Linux system the Linux kernel is the core of the operating system and offers an interface for programs to access the hardware. The kernel contains most of the device drivers.
 
 To create a kernel, it is necessary to install the kernel source code first. The Gentoo recommended kernel sources for a desktop system are, of course, sys-kernel/gentoo-sources. These are maintained by the Gentoo developers, and patched to fix security vulnerabilities, functional problems, as well as to improve compatibility with rare system architectures. But as always in Gentoo there's other options also available.
 
@@ -687,16 +483,7 @@ To get a full list of kernel sources with short descriptions can be found by sea
 
 ```shell
 emerge --search sources
-```
-
-</details>
-#### Installing the sources
-
-<details>
-<summary>Show Details</summary>
-
-
-Let's install the gentoo-sources:
+```#### Installing the sourcesLet's install the gentoo-sources:
 
 ```shell
 emerge -a sys-kernel/gentoo-sources
@@ -758,44 +545,17 @@ Once configured then simply run:
 
 ```shell
 genkernel all
-```
-
-</details>
-#### Configuring the modules
-
-<details>
-<summary>Show Details</summary>
-
-
-If we need to auto-load a kernel module each time to system boots we should specify it in */etc/conf.d/modules* file.
+```#### Configuring the modulesIf we need to auto-load a kernel module each time to system boots we should specify it in */etc/conf.d/modules* file.
 
 You can list your available modules with:
 
 ```shell
 find /lib/modules/<kernel version>/ -type f -iname '*.o' -or -iname '*.ko' | less
-```
-
-</details>
-#### Installing firmware
-
-<details>
-<summary>Show Details</summary>
-
-
-Some drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces. Most of the firmware is packaged in *sys-kernel/linux-firmware*, so installing them are almost needed in a laptop system:
+```#### Installing firmwareSome drivers require additional firmware to be installed on the system before they work. This is often the case for network interfaces, especially wireless network interfaces. Most of the firmware is packaged in *sys-kernel/linux-firmware*, so installing them are almost needed in a laptop system:
 
 ```shell
 emerge -a sys-kernel/linux-firmware
-```
-
-</details>
-### LVM Configuration
-
-<details>
-<summary>Show Details</summary>
-
-
-Install lvm tools if it's not yet installed:
+```### LVM ConfigurationInstall lvm tools if it's not yet installed:
 
 ```shell
 emerge -a sys-fs/lvm2
@@ -811,16 +571,7 @@ nano -w /etc/lvm/lvm.conf
 use_lvmetad = 1
 issue_discards = 1
 volume_list = ["vg0"] # Our VG volume name, check with vgdisplay
-```
-
-</details>
-### Fstab
-
-<details>
-<summary>Show Details</summary>
-
-
-Before editing fstab we need to know which UUID are using our devices inside and outside lvm and luks volumes:
+```### FstabBefore editing fstab we need to know which UUID are using our devices inside and outside lvm and luks volumes:
 
 ```shell
 blkid /dev/mapper/vg0-root | awk '{print $2}' | sed 's/"//g'
@@ -841,36 +592,15 @@ UUID="576e229c-cf68-4010-8d85-ff8149158416"     /       ext4    discard,noatime,
 UUID="95fa5807-ea57-4cf5-b717-74f4aba190e2"     /home   ext4    discard,noatime,commit=600                      0 0
 tmpfs                                           /var/tmp tmpfs  nodev,nosuid    								0 0
 tmpfs                                           /tmp    tmpfs   nodev,nosuid    								0 0
-```
+```### Configuring crypttab
 
-</details>
-### Configuring crypttab
-
-Warning!!! As we don't have encrypted partitions other than root which must be mounted by systemd before the whole system start we don't need to set it up there, so, our crypttab must be empty.
-
-</details>
-### Configuring mtab
-
-<details>
-<summary>Show Details</summary>
-
-
-In the past some utilities wrote information (like mount options) into /etc/mtab and thus it was supposed to be a regular file. Nowadays all software is supposed to avoid this problem. Still, before switching the file to become a symbolic link to /proc/self/mounts.
+Warning!!! As we don't have encrypted partitions other than root which must be mounted by systemd before the whole system start we don't need to set it up there, so, our crypttab must be empty.### Configuring mtabIn the past some utilities wrote information (like mount options) into /etc/mtab and thus it was supposed to be a regular file. Nowadays all software is supposed to avoid this problem. Still, before switching the file to become a symbolic link to /proc/self/mounts.
 
 To create the symlink, run:
 
 ```shell
 ln -sf /proc/self/mounts /etc/mtab
-```
-
-</details>
-### Systemd boot (bootloader)
-
-<details>
-<summary>Show Details</summary>
-
-
-Systemd-boot is a simple UEFI boot manager which executes configured EFI images. The default entry is selected by an on-screen menu.
+```### Systemd boot (bootloader)Systemd-boot is a simple UEFI boot manager which executes configured EFI images. The default entry is selected by an on-screen menu.
 
 It is simple to configure, but can only start EFI executables, such as the Linux kernel EFISTUB, UEFI Shell, GRUB, and go on.
 
@@ -899,16 +629,7 @@ Every time there's a new version of the systemd you should copy the new binaries
 
 ```shell
 bootctl --path=/boot update
-```
-
-</details>
-### Add bootloader entries
-
-<details>
-<summary>Show Details</summary>
-
-
-Add one entry into bootloader with this options:
+```### Add bootloader entriesAdd one entry into bootloader with this options:
 
 ```shell
 nano -w /boot/loader/entries/gentoo.conf
@@ -929,16 +650,7 @@ nano -w /boot/loader/loader.conf
 ```shell
 default gentoo
 timeout 3
-```
-
-</details>
-### Efibootmgr
-
-<details>
-<summary>Show Details</summary>
-
-
-Efibootmgr is not a bootloader itself it's a tool that interacts with the EFI firmware of the system, which itself is acting as a boot loader. With the efibootmgr application, boot entries can be created, reshuffled and updated.
+```### EfibootmgrEfibootmgr is not a bootloader itself it's a tool that interacts with the EFI firmware of the system, which itself is acting as a boot loader. With the efibootmgr application, boot entries can be created, reshuffled and updated.
 
 First we need to install the package:
 
@@ -975,40 +687,13 @@ efibootmgr -c -d /dev/sda -p 2 -L "Gentoo" -l "\efi\boot\bootx64.efi"
 
 Perfect, we're almost ready to reboot.
 
-## Rebooting into our new Gentoo systemd
-
-</details>
-### Enable lvm2
-
-<details>
-<summary>Show Details</summary>
-
-
-```shell
+## Rebooting into our new Gentoo systemd### Enable lvm2```shell
 systemctl enable lvm2-lvmetad.service
-```
-
-</details>
-### Change the root password
-
-<details>
-<summary>Show Details</summary>
-
-
-While in chroot we need to change the root password of our new system just before rebooting it.
+```### Change the root passwordWhile in chroot we need to change the root password of our new system just before rebooting it.
 
 ```shell
 passwd
-```
-
-</details>
-### And reboot to your new Gentoo system
-
-<details>
-<summary>Show Details</summary>
-
-
-Don't worry you don't need to cross your fingers, everything should goes fine :smirk:
+```### And reboot to your new Gentoo systemDon't worry you don't need to cross your fingers, everything should goes fine :smirk:
 
 ```shell
 exit # To exit from chroot
@@ -1016,40 +701,13 @@ sync # To sync filesystems
 reboot
 ```
 
-## Post-installation
-
-</details>
-### Setting the Hostname
-
-<details>
-<summary>Show Details</summary>
-
-
-When booted using systemd, a tool called hostnamectl exists for editing /etc/hostname and /etc/machine-info. So we don't need to edit the file manually simlpy run:
+## Post-installation### Setting the HostnameWhen booted using systemd, a tool called hostnamectl exists for editing /etc/hostname and /etc/machine-info. So we don't need to edit the file manually simlpy run:
 
 ```shell
 hostnamectl set-hostname <hostname>
-```
+```### Configuring NetworkLet's plug our new Gentoo system to the world!! :earth_africa:
 
-</details>
-### Configuring Network
-
-<details>
-<summary>Show Details</summary>
-
-
-Let's plug our new Gentoo system to the world!! :earth_africa:
-
-We can choose between two options, to use systemd as network manager or standalone one, I prefer networkmanager but here are the two options:
-
-</details>
-### Using systemd-networkd
-
-<details>
-<summary>Show Details</summary>
-
-
-systemd-networkd is useful for simple configuration of wired network interfaces. As it's disabled by default we need to configure it by creating a \*.network file under /etc/systemd/network.
+We can choose between two options, to use systemd as network manager or standalone one, I prefer networkmanager but here are the two options:### Using systemd-networkdsystemd-networkd is useful for simple configuration of wired network interfaces. As it's disabled by default we need to configure it by creating a \*.network file under /etc/systemd/network.
 
 Here is an example for a simple ethernet DHCP configuration:
 
@@ -1069,16 +727,7 @@ And then tell systemd to manage and start that service:
 ```shell
 systemctl enable systemd-networkd.service
 systemctl start systemd-networkd.service
-```
-
-</details>
-### Using NetworkManager
-
-<details>
-<summary>Show Details</summary>
-
-
-Often NetworkManager is used to configure network settings. I personally use nmtui because it's easy and has a ncurses client. Just install it:
+```### Using NetworkManagerOften NetworkManager is used to configure network settings. I personally use nmtui because it's easy and has a ncurses client. Just install it:
 
 ```shell
 emerge -a networkmanager
@@ -1088,16 +737,7 @@ And now simply run the following command and follow a guided configuration proce
 
 ```shell
 nmtui
-```
-
-</details>
-### Setting locales
-
-<details>
-<summary>Show Details</summary>
-
-
-Yes, you're right, we set the locales before but once booted with systemd, the tool localectl is used to set locale and console or X11 keymaps. So, let's set it again to be sure that everything goes fine.
+```### Setting localesYes, you're right, we set the locales before but once booted with systemd, the tool localectl is used to set locale and console or X11 keymaps. So, let's set it again to be sure that everything goes fine.
 
 To change the system locale, run the following command:
 
@@ -1115,16 +755,7 @@ And finally, to set the X11 layout:
 
 ```shell
 localectl set-x11-keymap es
-```
-
-</details>
-### Setting time and date
-
-<details>
-<summary>Show Details</summary>
-
-
-Time and date can be set using the timedatectl utility. That will also allow users to set up synchronization without needing to rely on net-misc/ntp or other providers than systemd's own implementation.
+```### Setting time and dateTime and date can be set using the timedatectl utility. That will also allow users to set up synchronization without needing to rely on net-misc/ntp or other providers than systemd's own implementation.
 
 To set the local time of the system clock directly:
 
@@ -1161,44 +792,17 @@ nano -w /etc/systemd/timesyncd.conf
 [Time]
 NTP=0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org 3.europe.pool.ntp.org
 FallbackNTP=0.gentoo.pool.ntp.org 1.gentoo.pool.ntp.org 2.gentoo.pool.ntp.org 3.gentoo.pool.ntp.org
-```
-
-</details>
-### File indexing
-
-<details>
-<summary>Show Details</summary>
-
-
-In order to index the file system to provide faster file location capabilities we will install sys-apps/mlocate:
+```### File indexingIn order to index the file system to provide faster file location capabilities we will install sys-apps/mlocate:
 
 ```shell
 emerge -a sys-apps/mlocate
 ```
 
-To keep databse update we need to run `updatedb` often.
-
-</details>
-### Filesystem tools
-
-<details>
-<summary>Show Details</summary>
-
-
-Additional to the tools for managing ext2, ext3, or ext4 filesystems (sys-fs/e2fsprogs) which are already installed as a part of the *@system* set I like to install other filesystem utilities like VFAT, XFS, NTFS and so on:
+To keep databse update we need to run `updatedb` often.### Filesystem toolsAdditional to the tools for managing ext2, ext3, or ext4 filesystems (sys-fs/e2fsprogs) which are already installed as a part of the *@system* set I like to install other filesystem utilities like VFAT, XFS, NTFS and so on:
 
 ```shell
 emerge -a sys-fs/xfsprogs sys-fs/exfat-utils sys-fs/dosfstools sys-fs/ntfs3g
-```
-
-</details>
-### Adding a user for daily use
-
-<details>
-<summary>Show Details</summary>
-
-
-Until now we have done everything as root but working as root on a Unix/Linux system is dangerous and should be avoided as much as possible. Therefore it is strongly recommended to add a user for day-to-day use.
+```### Adding a user for daily useUntil now we have done everything as root but working as root on a Unix/Linux system is dangerous and should be avoided as much as possible. Therefore it is strongly recommended to add a user for day-to-day use.
 
 The groups the user is member of define what activities the user can perform. The following table lists a number of important groups:
 
@@ -1221,16 +825,7 @@ To set the user password run:
 
 ```shell
 passwd <username>
-```
-
-</details>
-### Exec as root with sudo
-
-<details>
-<summary>Show Details</summary>
-
-
-Sudo is a way that a regular user could run commands as root user. It's very useful to avoid using root password each time we need to run a command which needs root perms. To install run:
+```### Exec as root with sudoSudo is a way that a regular user could run commands as root user. It's very useful to avoid using root password each time we need to run a command which needs root perms. To install run:
 
 ```shell
 emerge -a app-admin/sudo
@@ -1242,29 +837,11 @@ Then edit config file with command:
 visudo
 ```
 
-There's lot of examples inside the config file so we should not have any problem to set it up.
-
-</details>
-### Removing installation tarballs
-
-<details>
-<summary>Show Details</summary>
-
-
-With the Gentoo installation finished and the system rebooted, if everything has gone well, we can now remove the downloaded stage3 tarball from the hard disk. Remember that they were downloaded to the / directory.
+There's lot of examples inside the config file so we should not have any problem to set it up.### Removing installation tarballsWith the Gentoo installation finished and the system rebooted, if everything has gone well, we can now remove the downloaded stage3 tarball from the hard disk. Remember that they were downloaded to the / directory.
 
 ```shell
 rm /stage3-*.tar.bz2*
-```
-
-</details>
-### Power consumption optimization with Powertop
-
-<details>
-<summary>Show Details</summary>
-
-
-```shell
+```### Power consumption optimization with Powertop```shell
 emerge -a sys-power/powertop
 ```
 
@@ -1296,10 +873,7 @@ Enable at each boot:
 
 ```shell
 systemctl enable powertop.service
-```
-
-</details>
-### GPU
+```### GPU
 
 Prior to install xorg we will configure our video card, mine is Intel Generation 6 so we need to add this line into make.conf:
 
@@ -1325,16 +899,7 @@ Section "Device"
 	Option      "DRI"          "3"
 	Option      "Backlight"    "intel_backlight"
 EndSection
-```
-
-</details>
-### Input devices
-
-<details>
-<summary>Show Details</summary>
-
-
-We need to do the same with the input devices. I'm using a laptop so check if you need to add joystick, mouse, keyboard, ... :wink:
+```### Input devicesWe need to do the same with the input devices. I'm using a laptop so check if you need to add joystick, mouse, keyboard, ... :wink:
 
 ```shell
 nano -w /etc/portage/make.conf
@@ -1342,53 +907,17 @@ nano -w /etc/portage/make.conf
 
 ```shell
 INPUT_DEVICES="evdev synaptics
-```
-
-</details>
-### X server
-
-<details>
-<summary>Show Details</summary>
-
-
-At the time to write this guide wayland is available but I'ld like to use bspwm which only support xorg so I'll continue with xorg server installation and configuration:
+```### X serverAt the time to write this guide wayland is available but I'ld like to use bspwm which only support xorg so I'll continue with xorg server installation and configuration:
 
 ```shell
 emerge -a xorg-server
-```
-
-</details>
-### A bunch of useful stuff
-
-<details>
-<summary>Show Details</summary>
-
-
-```shell
+```### A bunch of useful stuff```shell
 emerge -a app-admin/ccze app-arch/unp app-editors/vim app-eselect/eselect-awk app-misc/screen app-shells/gentoo-zsh-completions app-shells/gentoo-zsh-completions app-vim/colorschemes app-vim/eselect-syntax app-vim/genutils app-vim/ntp-syntax media-gfx/feh sys-process/htop x11-terms/rxvt-unicode
-```
-
-</details>
-### Portage nice value
-
-<details>
-<summary>Show Details</summary>
-
-
-We're running portage with modified scheduling priority, to not impact whole system performance during compilation.
+```### Portage nice valueWe're running portage with modified scheduling priority, to not impact whole system performance during compilation.
 
 ```shell
 echo 'PORTAGE_NICENESS="15"' >> /etc/portage/make.conf
-```
-
-</details>
-### Setting portage branches
-
-<details>
-<summary>Show Details</summary>
-
-
-Branch defines if portage use stable or testing packages. Every package in the portage tree has it stable and testing version. The ACCEPT_KEYWORDS variable defines what software branch to use on the system. It defaults to the stable software branch for the system's architecture, for instance amd64.
+```### Setting portage branchesBranch defines if portage use stable or testing packages. Every package in the portage tree has it stable and testing version. The ACCEPT_KEYWORDS variable defines what software branch to use on the system. It defaults to the stable software branch for the system's architecture, for instance amd64.
 
 I recommend to stick with the stable branch. However, if stability is not that much important for you and/or want to help out Gentoo by submitting bug reports to [https://bugs.gentoo.org](https://bugs.gentoo.org), then the testing is your way.
 
@@ -1412,16 +941,7 @@ There are two ways to approach the testing branch for packages:
 >sys-kernel/gentoo-sources
 >sys-power/powertop
 >app-admin/pass
->```
-
-</details>
-### Masked and unmasked packages
-
-<details>
-<summary>Show Details</summary>
-
-
-Masking a package the way where Gentoo Developers block a package version from being auto installed. The reason why that package is masked is mentioned in the package.mask file (situated in /usr/portage/profiles/ by default). But if we still wants to use this package, then add the desired version (usually this will be the exact same line from the package.mask file in the profile) to the /etc/portage/package.unmask file (or in a file in that directory if it is a directory).
+>```### Masked and unmasked packagesMasking a package the way where Gentoo Developers block a package version from being auto installed. The reason why that package is masked is mentioned in the package.mask file (situated in /usr/portage/profiles/ by default). But if we still wants to use this package, then add the desired version (usually this will be the exact same line from the package.mask file in the profile) to the /etc/portage/package.unmask file (or in a file in that directory if it is a directory).
 
 ```shell
 nano -w /etc/portage/package.unmask
@@ -1441,16 +961,7 @@ nano -w /etc/portage/package.mask
 
 ```shell
 =sys-kernel/gentoo-sources-4.5.0
-```
-
-</details>
-### Overlays
-
-<details>
-<summary>Show Details</summary>
-
-
-Overlays contain additional packages for your Gentoo system while the main repository contains all the software packages maintained by Gentoo developers, additional package trees are usually hosted by repositories. Users can add such additional repositories to the tree that are "laid over" the main tree - hence the name, overlays.
+```### OverlaysOverlays contain additional packages for your Gentoo system while the main repository contains all the software packages maintained by Gentoo developers, additional package trees are usually hosted by repositories. Users can add such additional repositories to the tree that are "laid over" the main tree - hence the name, overlays.
 
 ```shell
 emerge -a app-portage/layman
@@ -1472,16 +983,7 @@ To keep your installed overlays up to date, run:
 
 ```shell
 layman -S
-```
-
-</details>
-#### Custom overlay
-
-<details>
-<summary>Show Details</summary>
-
-
-If we want to maintain a custom set of ebuilds we just only need to create a local overlay doing these few steps:
+```#### Custom overlayIf we want to maintain a custom set of ebuilds we just only need to create a local overlay doing these few steps:
 
 ```shell
 mkdir -p /usr/local/portage/{metadata,profiles}
@@ -1505,11 +1007,8 @@ nano -w /etc/portage/repos.conf/local.conf
 location = /usr/local/portage
 auto-sync = no
 ```
-</details>
-### Virtualization (How to use Qemu & kvm)
 
-<details>
-<summary>Show Details</summary>
+### Virtualization (How to use Qemu & kvm)
 
 Virtualization is widely use nowadays. Everybody wants to test some environments, apps, or simply have a virtualized machine with other operating systems. In order to do that we should use any virtualization platform available for desktop use such as virtualbox, kvm/qemu, xen or vmware. Among all these options I choose kvm/qemu because its performance and simplicity. So here we are!
 
@@ -1526,11 +1025,8 @@ ls /dev/kvm
 ```
 
 If both are available we can continue installing kvm, otherwise you shouldn't use virtualization on your machine.
-</details>
-#### Kernel options
 
-<details>
-<summary>Show Details</summary>
+#### Kernel options
 
 Before continue building kvm with should check if we have some kernel options enabled as module or build-in.
 
@@ -1569,13 +1065,7 @@ Finally, to be sure that libvirt daemon is running all the time we should enable
 
 ```shell
 systemctl enable libvirtd.service
-```
-</details>
-</details>
-### Speed up the system with prelink
-
-<details>
-<summary>Show Details</summary>
+```### Speed up the system with prelink
 What is Prelink and how can it help me? I'm sure that most of you are asking this question right now well, most applications we have installed in our system use shared libraries. Every time a program call this libraries they need to be loaded into memory. As more libraries program needs as more time it takes to resolve all symbol references. So prelink simply "maps" this symbol references and makes applications run faster. Of course this is a summary of what it does, but it's enough for us.
 
 The only thing we need to do is to prelink binaries every time we upgrade or install any new program o library. But don't worry, portage will automatically prelink our system for us each time we install a package if we have prelink installed in our system. That's great!!
@@ -1613,10 +1103,5 @@ Which is:
 
 ## References
 
-<details>
-<summary>Show Details</summary>
-
 * [Sakaki's EFI Install Guide](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide)
 * [Gentoo AMD64 Handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64)
-
-</details>
