@@ -6,9 +6,9 @@
 
 ## Contents
 
-* [Gentoo Advanced Installer - Option 1](#gentoo-advanced-installer)
-* [Gentoo Auto Install Script - Option 2](#gentoo-auto-install-script)
-* [Gentoo Manule Installation - Option 3](#gentoo-manule-installation)
+* [Gentoo Advanced Installer - Option 1](#gentoo-advanced-installer-option-1)
+* [Gentoo Auto Install Script - Option 2](#gentoo-auto-install-script-option-2)
+* [Gentoo Manule Installation - Option 3](#gentoo-manule-installation-option-3)
 * [Installing the Gentoo base system](#installing-the-gentoo-base-system)
 * [Configuring base system](#configuring-base-system)
 * [Rebooting into our new Gentoo systemd](#rebooting-into-our-new-gentoo-systemd)
