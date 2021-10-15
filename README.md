@@ -19,7 +19,8 @@
 	- [Last notes](#last-notes)
 
 <details>
-<h1>Gentoo Advanced Installer [Option 1]</h1><summary>Show Details</summary>
+<h1>Gentoo Advanced Installer [Option 1]</h1>
+	<summary>Show Details</summary>
 The GUI Installer guides you through the configuration process with detailed information regarding each step. The configurations are stored in the `gentoo.conf` file which can also be edited by hand by renaming the 'gentoo.conf.example' file, backed up and reused later if desired. 
 
 ## Partitioning
