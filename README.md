@@ -3,11 +3,9 @@
 
 ![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
 
-#Gentoo in 60 seconds
+# Gentoo in 60 seconds - GO!!!!
 
 `wget -O - https://bit.ly/GentooInstall | bash`
-
-(case-sensitive)
 
 ## Contents
 
