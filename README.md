@@ -1,4 +1,21 @@
-## About Gentoo-install
+
+# Gentoo install guide
+
+![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
+
+
+## Contents
+
+* [Gentoo Advanced Installer](#gentoo-advanced-installer)
+* [Gentoo Auto Install Script](#gentoo-auto-install-scritp)
+* [Gentoo Manule Installation](#gentoo-manule-install)
+* [Installing the Gentoo base system](#installing-the-gentoo-base-system)
+* [Configuring base system](#configuring-base-system)
+* [Rebooting into our new Gentoo systemd](#rebooting-into-our-new-gentoo-systemd)
+* [Post-installation](#post-installation)
+* [Last notes](#last-notes)
+
+## Gentoo Advanced Installer
 The GUI Installer guides you through the configuration process with detailed information regarding each step. The configurations are stored in the `gentoo.conf` file which can also be edited by hand by renaming the 'gentoo.conf.example' file, backed up and reused later if desired. 
 
 ## Partitioning
@@ -30,22 +47,8 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 
 1. Ssh You can provide keys that will be written to root's `.ssh/authorized_keys` 
 
-# Gentoo install guide (Manual )
 
-![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
-
-## Contents
-
-* [Introduction](#introduction)
-* [Installation concerns](#installation-concerns)
-* [Start live-cd environment](#start-live-cd-environment)
-* [Installing the Gentoo base system](#installing-the-gentoo-base-system)
-* [Configuring base system](#configuring-base-system)
-* [Rebooting into our new Gentoo systemd](#rebooting-into-our-new-gentoo-systemd)
-* [Post-installation](#post-installation)
-* [Last notes](#last-notes)
-
-## Auto Installer 
+# Gentoo Auto Install Script
 
 export MIRROR=http://lug.mtu.edu/gentoo/ && export STAGE_PATH=releases/amd64/autobuilds/current-stage3-amd64/ && export PORTAGE_PATH=snapshots/ && export STAGE_BALL=stage3-amd64-20210630T214504Z.tar.xz && export PORTAGE_SNAPSHOT=portage-latest.tar.xz && export ROOTDEV=/dev/sda4 && export FS_BOOT_UUID=3c2398d1-c84a-425d-b35b-63841188ff01 && export FS_SWAP_UUID=cf048d96-2455-4dbd-bda1-5a0931897a6f && export FS_ROOT_UUID="" && export ETC_CONFD_HOSTNAME="don" && export ETC_TIMEZONE="America/Detroit" && export KERNEL_SOURCES="sys-kernel/gentoo-sources" && export PROFILE='desktop/plasma/systemd (stable)' && export SYS_CPU_TGT="3"
 
@@ -80,7 +83,7 @@ INNERSCRIPT
 echo "$INNER_SCRIPT" > /mnt/gentoo/chroot_inner_script.sh && chroot /mnt/gentoo/ /bin/bash /chroot_inner_script.sh "$FS_ROOT_UUID" "$FS_BOOT_UUID" "$FS_SWAP_UUID" "$FS_HOME_UUID" "$ETC_CONFD_HOSTNAME" "$ETC_CONFD_NET_FILE_CONTENT" "$http_proxy" "$KERNEL_SOURCES"
 
 
-## Manule Installation 
+# Gentoo Manule Installation 
 
 The first thing we need to install our Gentoo is a live-cd environment with uefi vars enabled.
 
