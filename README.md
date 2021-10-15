@@ -1,7 +1,9 @@
 
 # Gentoo install guide
 
-![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)## Contents
+![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
+
+## Contents
 
 - [Gentoo Advanced Installer - Option 1](#gentoo-advanced-installer-option-1)
 	- [Partitioning](#partitioning)
