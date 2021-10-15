@@ -6,16 +6,16 @@
 
 ## Contents
 
-* [Gentoo Advanced Installer](#gentoo-advanced-installer)
-* [Gentoo Auto Install Script](#gentoo-auto-install-script)
-* [Gentoo Manule Installation](#gentoo-manule-installation)
+* [Gentoo Advanced Installer - Option 1](#gentoo-advanced-installer)
+* [Gentoo Auto Install Script - Option 2](#gentoo-auto-install-script)
+* [Gentoo Manule Installation - Option 3](#gentoo-manule-installation)
 * [Installing the Gentoo base system](#installing-the-gentoo-base-system)
 * [Configuring base system](#configuring-base-system)
 * [Rebooting into our new Gentoo systemd](#rebooting-into-our-new-gentoo-systemd)
 * [Post-installation](#post-installation)
 * [Last notes](#last-notes)
 
-## Gentoo Advanced Installer
+## Gentoo Advanced Installer [Option 1]
 The GUI Installer guides you through the configuration process with detailed information regarding each step. The configurations are stored in the `gentoo.conf` file which can also be edited by hand by renaming the 'gentoo.conf.example' file, backed up and reused later if desired. 
 
 ## Partitioning
@@ -33,7 +33,7 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 3. Run `./configure` to launch the GUI Installer
 4. Finally run `./install` to begin the installation process
 
-# Gentoo Auto Install Script
+# Gentoo Auto Install Script [Option 2]
 
 The Gentoo Auto Install script is run from inside the [Gentoo Live CD](https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20211010T170540Z/install-amd64-minimal-20211010T170540Z.iso) and will install Gentoo on the primary hard drive using the entire disk.
 
@@ -76,7 +76,7 @@ reboot
 3. Use a safe umask like `umask 0077`
 4. If you are looking for a way to detect and manage your kernel configuration, have a look at [autokernel](https://github.com/oddlama/autokernel).
 
-# Gentoo Manule Installation 
+# Gentoo Manule Installation  [Option 3]
 
 The first thing we need to install our Gentoo is a live-cd environment with uefi vars enabled.
 
