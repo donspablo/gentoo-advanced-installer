@@ -19,9 +19,7 @@
 	- [Last notes](#last-notes)
 
 <details>
-<summary>
-<h1>Gentoo Advanced Installer [Option 1]</h1>
-</summary>
+<summary><h1>Gentoo Advanced Installer [Option 1]</h1></summary>
 The GUI Installer guides you through the configuration process with detailed information regarding each step. The configurations are stored in the `gentoo.conf` file which can also be edited by hand by renaming the 'gentoo.conf.example' file, backed up and reused later if desired. 
 
 ## Partitioning
@@ -40,9 +38,7 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 4. Finally run `./install` to begin the installation process
 </details>
 <details>
-<summary>
-<h1>Gentoo Auto Install Script [Option 2]</h1>
-</summary>
+<summary><h1>Gentoo Auto Install Script [Option 2]</h1></summary>
 
 The Gentoo Auto Install script is run from inside the [Gentoo Live CD](https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20211010T170540Z/install-amd64-minimal-20211010T170540Z.iso) and will install Gentoo on the primary hard drive using the entire disk.
 
@@ -86,9 +82,7 @@ reboot
 4. If you are looking for a way to detect and manage your kernel configuration, have a look at [autokernel](https://github.com/oddlama/autokernel).
 </details>
 <details>
-<summary>
-<h1>Gentoo Manule Installation  [Option 3]</h1>
-</summary>
+<summary><h1>Gentoo Manule Installation  [Option 3]</h1></summary>
 
 The first thing we need to install our Gentoo is a live-cd environment with uefi vars enabled.
 
