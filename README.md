@@ -63,10 +63,9 @@ GRUB_CMDLINE_LINUX="net.ifnames=0"
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=0
 IEND
-grub-install ${TARGET_DISK} && grub-mkconfig -o /boot/grub/grub.cfg && ln -s /etc/init.d/net.lo /etc/init.d/net.eth0 && rc-update add net.eth0 default && echo "root:$ROOT_PASSWORD" | chpasswd
+grub-install ${TARGET_DISK} && grub-mkconfig -o /boot/grub/grub.cfg && ln -s /etc/init.d/net.lo /etc/init.d/net.eth0 && rc-update add net.eth0 default
 END
-
-reboot
+echo "root:$ROOT_PASSWORD" | chpasswd && reboot
 ```
 ## Important Information1. The system will use `sys-kernel/gentoo-kernel-bin` should be replaced with a custom-built one when the system is functional.
 2. Adjust `/etc/portage/make.conf`
