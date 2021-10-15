@@ -3,7 +3,7 @@
 
 ![gentoo_logo](images/200px-gentoo-logo-dark.svg.png)
 
-`<(curl https://bit.ly/GentooInstall || wget -O - https://bit.ly/GentooInstall )`
+`wget -O - https://bit.ly/GentooInstall | bash`
 
 ## Contents
 
