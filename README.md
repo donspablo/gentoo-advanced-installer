@@ -45,36 +45,42 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 * [Post-installation](#post-installation)
 * [Last notes](#last-notes)
 
-## Introduction
+## Auto Installer 
 
-Gentoo is a Linux distribution that, unlike binary distros like Arch, Debian and many others, the software is compiled locally according to the user preferences and optimizations.
+export MIRROR=http://lug.mtu.edu/gentoo/ && export STAGE_PATH=releases/amd64/autobuilds/current-stage3-amd64/ && export PORTAGE_PATH=snapshots/ && export STAGE_BALL=stage3-amd64-20210630T214504Z.tar.xz && export PORTAGE_SNAPSHOT=portage-latest.tar.xz && export ROOTDEV=/dev/sda4 && export FS_BOOT_UUID=3c2398d1-c84a-425d-b35b-63841188ff01 && export FS_SWAP_UUID=cf048d96-2455-4dbd-bda1-5a0931897a6f && export FS_ROOT_UUID="" && export ETC_CONFD_HOSTNAME="don" && export ETC_TIMEZONE="America/Detroit" && export KERNEL_SOURCES="sys-kernel/gentoo-sources" && export PROFILE='desktop/plasma/systemd (stable)' && export SYS_CPU_TGT="3"
 
-The name of Gentoo comes from the penguin species who are the fastest swimming penguin in the world.
+ETC_CONFD_NET_FILE_CONTENT=$(cat <<'EOF'
+config_eth0="dhcp"
+EOF
+)
 
-I've been using Gentoo since 2002, and what I like most from Gentoo is:
+MAKE_CONF=$(cat <<EOF
+CFLAGS="-O2 -pipe -march=native -ggdb"
+CXXFLAGS="\${CFLAGS}"
+MAKEOPTS="--jobs=${SYS_CPU_TGT}"
+EMERGE_DEFAULT_OPTS="--jobs=${SYS_CPU_TGT} --verbose --tree --keep-going --with-bdeps=y"
+FEATURES="splitdebug"
+LINGUAS="en"
+USE="mmx sse sse2 sse3 ssse3 posix nptl smp avahi curl ipv6 acpi dbus hddtemp libnotify lm_sensors pam readline syslog udev unicode usb -gnome -oss -static"
+GENTOO_MIRRORS="http://chi-10g-1-mirror.fastsoft.net/pub/linux/gentoo/gentoo-distfiles/ http://mirrors.cs.wmich.edu/gentoo http://gentoo.mirrors.tds.net/gentoo"
+VIDEO_CARDS="intel i965 nvidia"
+INPUT_DEVICES="evdev"
+ALSA_CARDS=""
+CHOST="x86_64-pc-linux-gnu"
+EOF
+)
 
-* Is fun
-* The possibility to get everything under control
-* Deep customization
-* One learn **a lot** from using it
+STAGEFILEPATH="$MIRROR$STAGE_PATH$STAGE_BALL" && wget "$STAGEFILEPATH"  && unset STAGEFILEPATH && PORTAGEFILEPATH="$MIRROR$PORTAGE_PATH$PORTAGE_SNAPSHOT" && wget "$PORTAGEFILEPATH" && unset PORTAGEFILEPATH && unset ROOTPATH && mkfs.ext4 -F -E discard -O sparse_super2 "$ROOTDEV" && FS_ROOT_UUID=$(tune2fs -l "$ROOTDEV"|grep "Filesystem UUID"|cut -f2 -d:|sed -e 's/ \+//') && mount "$ROOTDEV" -o nobarrier,noatime,discard,max_batch_time=100000,data=writeback /mnt/gentoo && tar xpf "$STAGE_BALL" -C /mnt/gentoo && tar xpf "$PORTAGE_SNAPSHOT" -C /mnt/gentoo/usr && echo "$MAKE_CONF" > /mnt/gentoo/etc/portage/make.conf && echo "$ETC_TIMEZONE" > /mnt/gentoo/etc/timezone && cp "/mnt/gentoo/usr/share/zoneinfo/$ETC_TIMEZONE" /mnt/gentoo/etc/localtime && cp -L /etc/resolv.conf /mnt/gentoo/etc/resolv.conf && mount -t proc none /mnt/gentoo/proc && mount --rbind /dev /mnt/gentoo/dev/ && mount -t tmpfs none -o rw,nosuid,nodev,mode=1777 /dev/shm && mount -t devpts none -o rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 /mnt/gentoo/dev/pts
 
-| :warning: Disclaimer                                                                                                                |
-| :---------------------------------------------------------------------------------------------------------------------------------- |
-| Please keep in mind that this is not a generic guide on how to install Gentoo. This guide focuses on a few precise install options. |
+INNER_SCRIPT=$(cat <<INNERSCRIPT
+env-update  && source /etc/profile && export PS1="(autochroot) \$PS1" && echo "" > /etc/fstab && echo "UUID=$FS_BOOT_UUID\t/boot\text4\tdefaults,noatime,discard\t1\t2" >> /etc/fstab && echo "UUID=$FS_SWAP_UUID\tnone\tswap\tdefaults,discard\t0\t0" >> /etc/fstab && echo "UUID=$FS_ROOT_UUID\t/\text4\tnoatime,discard\t0\t1" >> /etc/fstab && echo "/dev/cdrom\t/mnt/cdrom\tauto\tuser,noauto\t0\t0" >> /etc/fstab && swapon -a && echo "hostname=\"$ETC_CONFD_HOSTNAME\"" > /etc/conf.d/hostname && echo "$ETC_CONFD_NET_FILE_CONTENT" > /etc/conf.d/net && logger "Writing and generating locales" && echo '' > /etc/locales.gen && echo "en_US ISO-8859-1" >> /etc/locales.gen && echo "en_US.UTF-8 UTF-8" >> /etc/locales.gen && locale-gen && echo '' > /etc/env.d/02locale && echo 'LANG="en_US.UTF-8"' >> /etc/env.d/02locale && echo 'LC_COLLATE="C"' >> /etc/env.d/02locale && env-update && source /etc/profile && emerge --sync && emerge -1 app-admin/perl-cleaner && emerge app-portage/gentoolkit && emerge --update --deep --newuse sys-apps/portage && emerge $KERNEL_SOURCES && emerge --update --deep --newuse @world && hash -r && hash perl-cleaner 2> /dev/null && perl-cleaner --reallyall && revdep-rebuild && dispatch-conf && profile_no=\$(eselect profile list | grep '$PROFILE' | tail -n1 | cut -d'[' -f2 | cut -d']' -f1) && eselect profile set \$profile_no && emerge -e @world && emerge app-admin/syslog-ng sys-process/vixie-cron net-misc/openssh net-misc/dhcpcd sys-apps/mlocate && rc-update add syslog-ng default && rc-update add vixie-cron default && rc-update add sshd default && emerge app-portage/genlop sys-process/htop app-portage/eix
+INNERSCRIPT
+)
 
-This guide is made for those of you who wants to:
+echo "$INNER_SCRIPT" > /mnt/gentoo/chroot_inner_script.sh && chroot /mnt/gentoo/ /bin/bash /chroot_inner_script.sh "$FS_ROOT_UUID" "$FS_BOOT_UUID" "$FS_SWAP_UUID" "$FS_HOME_UUID" "$ETC_CONFD_HOSTNAME" "$ETC_CONFD_NET_FILE_CONTENT" "$http_proxy" "$KERNEL_SOURCES"
 
-1. Install Gentoo Linux
-2. Learn from an amazing Linux distro and its installation process
-3. Want to use systemD and not OpenRC
 
-If you are that kind of person, speak *emerge* and enter :wink:
-
-## Installation concerns
-
-> Stop before further reading. It's important to know that this guide only contemplates an installation with uefi, crypt/luks disk, lvm partitioning and systemd init system. Please remember that if you want a different setup don't take this as a how-to but more as a general guideline. Also remember to keep an eye on each step to adapt it to your taste :thumbsup:
-
-## Start live-cd environment
+## Manule Installation 
 
 The first thing we need to install our Gentoo is a live-cd environment with uefi vars enabled.
 
