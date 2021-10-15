@@ -33,6 +33,40 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 3. Run `./configure` to launch the GUI Installer
 4. Finally run `./install` to begin the installation process
 
+# Gentoo Auto Install Script
+
+The Gentoo Auto Install script is run from inside the [Gentoo Live CD](https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20211010T170540Z/install-amd64-minimal-20211010T170540Z.iso) and will install Gentoo on the primary hard drive using the entire disk.
+
+```
+GENTOO_MIRROR="http://distfiles.gentoo.org" && GENTOO_ARCH="amd64" && GENTOO_STAGE3="amd64" && TARGET_DISK=/dev/sda && TARGET_BOOT_SIZE=100M && TARGET_SWAP_SIZE=1G && GRUB_PLATFORMS=pc && STAGE3_PATH_URL="$GENTOO_MIRROR/releases/$GENTOO_ARCH/autobuilds/latest-stage3-$GENTOO_STAGE3.txt" && STAGE3_PATH=$(curl -s "$STAGE3_PATH_URL" | grep -v "^#" | cut -d" " -f1) && STAGE3_URL="$GENTOO_MIRROR/releases/$GENTOO_ARCH/autobuilds/$STAGE3_PATH" && LIVECD_KERNEL_VERSION=$(cut -d " " -f 3 < /proc/version) && sfdisk ${TARGET_DISK} << END
+size=$TARGET_BOOT_SIZE,bootable
+size=$TARGET_SWAP_SIZE
+;
+END
+
+yes | mkfs.ext4 ${TARGET_DISK}1 && yes | mkswap ${TARGET_DISK}2 && yes | mkfs.ext4 ${TARGET_DISK}3 && e2label ${TARGET_DISK}1 boot && swaplabel ${TARGET_DISK}2 -L swap && e2label ${TARGET_DISK}3 root && swapon ${TARGET_DISK}2 && mkdir -p /mnt/gentoo && mount ${TARGET_DISK}3 /mnt/gentoo && mkdir -p /mnt/gentoo/boot && mount ${TARGET_DISK}1 /mnt/gentoo/boot && cd /mnt/gentoo && wget "$STAGE3_URL" && tar xvpf "$(basename "$STAGE3_URL")" --xattrs-include='*.*' --numeric-owner && rm -fv "$(basename "$STAGE3_URL")" && cp -v "/mnt/cdrom/boot/gentoo" "/mnt/gentoo/boot/vmlinuz-$LIVECD_KERNEL_VERSION" && cp -v "/mnt/cdrom/boot/gentoo.igz" "/mnt/gentoo/boot/initramfs-$LIVECD_KERNEL_VERSION.img" && cp -vR "/lib/modules/$LIVECD_KERNEL_VERSION" "/mnt/gentoo/lib/modules/" && mkdir -p /mnt/gentoo/etc/kernels && cp -v /etc/kernels/* /mnt/gentoo/etc/kernels && cp -v /etc/resolv.conf /mnt/gentoo/etc/ && cat >> /mnt/gentoo/etc/fstab << END
+LABEL=boot /boot ext4 noauto,noatime 1 2
+LABEL=swap none  swap sw             0 0
+LABEL=root /     ext4 noatime        0 1
+END
+
+mount -t proc none /mnt/gentoo/proc && mount -t sysfs none /mnt/gentoo/sys && mount -o bind /dev /mnt/gentoo/dev && mount -o bind /dev/pts /mnt/gentoo/dev/pts && mount -o bind /dev/shm /mnt/gentoo/dev/shm &&
+
+chroot /mnt/gentoo /bin/bash -s << END
+set -e  && env-update && source /etc/profile && mkdir -p /etc/portage/repos.conf && cp -f /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf && emerge-webrsync && emerge sys-kernel/gentoo-sources && emerge grub && cat >> /etc/portage/make.conf << IEND
+GRUB_PLATFORMS="$GRUB_PLATFORMS"
+IEND
+cat >> /etc/default/grub << IEND
+GRUB_CMDLINE_LINUX="net.ifnames=0"
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=0
+IEND
+grub-install ${TARGET_DISK} && grub-mkconfig -o /boot/grub/grub.cfg && ln -s /etc/init.d/net.lo /etc/init.d/net.eth0 && rc-update add net.eth0 default && passwd -d -l root
+END
+
+reboot
+
+```
 ## Important Information
 
 1. The system will use `sys-kernel/gentoo-kernel-bin` should be replaced with a custom-built one when the system is functional.
@@ -42,46 +76,6 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
    - Set `FEATURES="buildpkg"` if you want to build binary packages
 3. Use a safe umask like `umask 0077`
 4. If you are looking for a way to detect and manage your kernel configuration, have a look at [autokernel](https://github.com/oddlama/autokernel).
-
-### Optional
-
-1. Ssh You can provide keys that will be written to root's `.ssh/authorized_keys` 
-
-
-# Gentoo Auto Install Script
-```
-export MIRROR=http://lug.mtu.edu/gentoo/ && export STAGE_PATH=releases/amd64/autobuilds/current-stage3-amd64/ && export PORTAGE_PATH=snapshots/ && export STAGE_BALL=stage3-amd64-20210630T214504Z.tar.xz && export PORTAGE_SNAPSHOT=portage-latest.tar.xz && export ROOTDEV=/dev/sda4 && export FS_BOOT_UUID=3c2398d1-c84a-425d-b35b-63841188ff01 && export FS_SWAP_UUID=cf048d96-2455-4dbd-bda1-5a0931897a6f && export FS_ROOT_UUID="" && export ETC_CONFD_HOSTNAME="don" && export ETC_TIMEZONE="America/Detroit" && export KERNEL_SOURCES="sys-kernel/gentoo-sources" && export PROFILE='desktop/plasma/systemd (stable)' && export SYS_CPU_TGT="3"
-
-ETC_CONFD_NET_FILE_CONTENT=$(cat <<'EOF'
-config_eth0="dhcp"
-EOF
-)
-
-MAKE_CONF=$(cat <<EOF
-CFLAGS="-O2 -pipe -march=native -ggdb"
-CXXFLAGS="\${CFLAGS}"
-MAKEOPTS="--jobs=${SYS_CPU_TGT}"
-EMERGE_DEFAULT_OPTS="--jobs=${SYS_CPU_TGT} --verbose --tree --keep-going --with-bdeps=y"
-FEATURES="splitdebug"
-LINGUAS="en"
-USE="mmx sse sse2 sse3 ssse3 posix nptl smp avahi curl ipv6 acpi dbus hddtemp libnotify lm_sensors pam readline syslog udev unicode usb -gnome -oss -static"
-GENTOO_MIRRORS="http://chi-10g-1-mirror.fastsoft.net/pub/linux/gentoo/gentoo-distfiles/ http://mirrors.cs.wmich.edu/gentoo http://gentoo.mirrors.tds.net/gentoo"
-VIDEO_CARDS="intel i965 nvidia"
-INPUT_DEVICES="evdev"
-ALSA_CARDS=""
-CHOST="x86_64-pc-linux-gnu"
-EOF
-)
-
-STAGEFILEPATH="$MIRROR$STAGE_PATH$STAGE_BALL" && wget "$STAGEFILEPATH"  && unset STAGEFILEPATH && PORTAGEFILEPATH="$MIRROR$PORTAGE_PATH$PORTAGE_SNAPSHOT" && wget "$PORTAGEFILEPATH" && unset PORTAGEFILEPATH && unset ROOTPATH && mkfs.ext4 -F -E discard -O sparse_super2 "$ROOTDEV" && FS_ROOT_UUID=$(tune2fs -l "$ROOTDEV"|grep "Filesystem UUID"|cut -f2 -d:|sed -e 's/ \+//') && mount "$ROOTDEV" -o nobarrier,noatime,discard,max_batch_time=100000,data=writeback /mnt/gentoo && tar xpf "$STAGE_BALL" -C /mnt/gentoo && tar xpf "$PORTAGE_SNAPSHOT" -C /mnt/gentoo/usr && echo "$MAKE_CONF" > /mnt/gentoo/etc/portage/make.conf && echo "$ETC_TIMEZONE" > /mnt/gentoo/etc/timezone && cp "/mnt/gentoo/usr/share/zoneinfo/$ETC_TIMEZONE" /mnt/gentoo/etc/localtime && cp -L /etc/resolv.conf /mnt/gentoo/etc/resolv.conf && mount -t proc none /mnt/gentoo/proc && mount --rbind /dev /mnt/gentoo/dev/ && mount -t tmpfs none -o rw,nosuid,nodev,mode=1777 /dev/shm && mount -t devpts none -o rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 /mnt/gentoo/dev/pts
-
-INNER_SCRIPT=$(cat <<INNERSCRIPT
-env-update  && source /etc/profile && export PS1="(autochroot) \$PS1" && echo "" > /etc/fstab && echo "UUID=$FS_BOOT_UUID\t/boot\text4\tdefaults,noatime,discard\t1\t2" >> /etc/fstab && echo "UUID=$FS_SWAP_UUID\tnone\tswap\tdefaults,discard\t0\t0" >> /etc/fstab && echo "UUID=$FS_ROOT_UUID\t/\text4\tnoatime,discard\t0\t1" >> /etc/fstab && echo "/dev/cdrom\t/mnt/cdrom\tauto\tuser,noauto\t0\t0" >> /etc/fstab && swapon -a && echo "hostname=\"$ETC_CONFD_HOSTNAME\"" > /etc/conf.d/hostname && echo "$ETC_CONFD_NET_FILE_CONTENT" > /etc/conf.d/net && logger "Writing and generating locales" && echo '' > /etc/locales.gen && echo "en_US ISO-8859-1" >> /etc/locales.gen && echo "en_US.UTF-8 UTF-8" >> /etc/locales.gen && locale-gen && echo '' > /etc/env.d/02locale && echo 'LANG="en_US.UTF-8"' >> /etc/env.d/02locale && echo 'LC_COLLATE="C"' >> /etc/env.d/02locale && env-update && source /etc/profile && emerge --sync && emerge -1 app-admin/perl-cleaner && emerge app-portage/gentoolkit && emerge --update --deep --newuse sys-apps/portage && emerge $KERNEL_SOURCES && emerge --update --deep --newuse @world && hash -r && hash perl-cleaner 2> /dev/null && perl-cleaner --reallyall && revdep-rebuild && dispatch-conf && profile_no=\$(eselect profile list | grep '$PROFILE' | tail -n1 | cut -d'[' -f2 | cut -d']' -f1) && eselect profile set \$profile_no && emerge -e @world && emerge app-admin/syslog-ng sys-process/vixie-cron net-misc/openssh net-misc/dhcpcd sys-apps/mlocate && rc-update add syslog-ng default && rc-update add vixie-cron default && rc-update add sshd default && emerge app-portage/genlop sys-process/htop app-portage/eix
-INNERSCRIPT
-)
-
-echo "$INNER_SCRIPT" > /mnt/gentoo/chroot_inner_script.sh && chroot /mnt/gentoo/ /bin/bash /chroot_inner_script.sh "$FS_ROOT_UUID" "$FS_BOOT_UUID" "$FS_SWAP_UUID" "$FS_HOME_UUID" "$ETC_CONFD_HOSTNAME" "$ETC_CONFD_NET_FILE_CONTENT" "$http_proxy" "$KERNEL_SOURCES"
-```
 
 # Gentoo Manule Installation 
 
