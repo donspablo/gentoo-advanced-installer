@@ -43,15 +43,12 @@ size=$TARGET_BOOT_SIZE,bootable
 size=$TARGET_SWAP_SIZE
 ;
 END
-
 yes | mkfs.ext4 ${TARGET_DISK}1 && yes | mkswap ${TARGET_DISK}2 && yes | mkfs.ext4 ${TARGET_DISK}3 && e2label ${TARGET_DISK}1 boot && swaplabel ${TARGET_DISK}2 -L swap && e2label ${TARGET_DISK}3 root && swapon ${TARGET_DISK}2 && mkdir -p /mnt/gentoo && mount ${TARGET_DISK}3 /mnt/gentoo && mkdir -p /mnt/gentoo/boot && mount ${TARGET_DISK}1 /mnt/gentoo/boot && cd /mnt/gentoo && wget "$STAGE3_URL" && tar xvpf "$(basename "$STAGE3_URL")" --xattrs-include='*.*' --numeric-owner && rm -fv "$(basename "$STAGE3_URL")" && cp -v "/mnt/cdrom/boot/gentoo" "/mnt/gentoo/boot/vmlinuz-$LIVECD_KERNEL_VERSION" && cp -v "/mnt/cdrom/boot/gentoo.igz" "/mnt/gentoo/boot/initramfs-$LIVECD_KERNEL_VERSION.img" && cp -vR "/lib/modules/$LIVECD_KERNEL_VERSION" "/mnt/gentoo/lib/modules/" && mkdir -p /mnt/gentoo/etc/kernels && cp -v /etc/kernels/* /mnt/gentoo/etc/kernels && cp -v /etc/resolv.conf /mnt/gentoo/etc/ && cat >> /mnt/gentoo/etc/fstab << END
 LABEL=boot /boot ext4 noauto,noatime 1 2
 LABEL=swap none  swap sw             0 0
 LABEL=root /     ext4 noatime        0 1
 END
-
 mount -t proc none /mnt/gentoo/proc && mount -t sysfs none /mnt/gentoo/sys && mount -o bind /dev /mnt/gentoo/dev && mount -o bind /dev/pts /mnt/gentoo/dev/pts && mount -o bind /dev/shm /mnt/gentoo/dev/shm &&
-
 chroot /mnt/gentoo /bin/bash -s << END
 set -e  && env-update && source /etc/profile && mkdir -p /etc/portage/repos.conf && cp -f /usr/share/portage/config/repos.conf /etc/portage/repos.conf/gentoo.conf && emerge-webrsync && emerge sys-kernel/gentoo-sources && emerge grub && cat >> /etc/portage/make.conf << IEND
 GRUB_PLATFORMS="$GRUB_PLATFORMS"
@@ -63,9 +60,7 @@ GRUB_TIMEOUT=0
 IEND
 grub-install ${TARGET_DISK} && grub-mkconfig -o /boot/grub/grub.cfg && ln -s /etc/init.d/net.lo /etc/init.d/net.eth0 && rc-update add net.eth0 default && passwd -d -l root
 END
-
 reboot
-
 ```
 ## Important Information
 
