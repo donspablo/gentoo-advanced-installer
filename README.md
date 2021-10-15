@@ -84,6 +84,7 @@ reboot
    - Set `FEATURES="buildpkg"` if you want to build binary packages
 3. Use a safe umask like `umask 0077`
 4. If you are looking for a way to detect and manage your kernel configuration, have a look at [autokernel](https://github.com/oddlama/autokernel).
+</details>
 <details>
 <summary>
 <h1>Gentoo Manule Installation  [Option 3]</h1>
