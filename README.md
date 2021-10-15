@@ -49,7 +49,7 @@ It also supports both EFI (recommended) and BIOS boot and can be used with Syste
 
 
 # Gentoo Auto Install Script
-`
+```
 export MIRROR=http://lug.mtu.edu/gentoo/ && export STAGE_PATH=releases/amd64/autobuilds/current-stage3-amd64/ && export PORTAGE_PATH=snapshots/ && export STAGE_BALL=stage3-amd64-20210630T214504Z.tar.xz && export PORTAGE_SNAPSHOT=portage-latest.tar.xz && export ROOTDEV=/dev/sda4 && export FS_BOOT_UUID=3c2398d1-c84a-425d-b35b-63841188ff01 && export FS_SWAP_UUID=cf048d96-2455-4dbd-bda1-5a0931897a6f && export FS_ROOT_UUID="" && export ETC_CONFD_HOSTNAME="don" && export ETC_TIMEZONE="America/Detroit" && export KERNEL_SOURCES="sys-kernel/gentoo-sources" && export PROFILE='desktop/plasma/systemd (stable)' && export SYS_CPU_TGT="3"
 
 ETC_CONFD_NET_FILE_CONTENT=$(cat <<'EOF'
@@ -81,7 +81,7 @@ INNERSCRIPT
 )
 
 echo "$INNER_SCRIPT" > /mnt/gentoo/chroot_inner_script.sh && chroot /mnt/gentoo/ /bin/bash /chroot_inner_script.sh "$FS_ROOT_UUID" "$FS_BOOT_UUID" "$FS_SWAP_UUID" "$FS_HOME_UUID" "$ETC_CONFD_HOSTNAME" "$ETC_CONFD_NET_FILE_CONTENT" "$http_proxy" "$KERNEL_SOURCES"
-`
+```
 
 # Gentoo Manule Installation 
 
